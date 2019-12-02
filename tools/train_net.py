@@ -15,7 +15,7 @@ from maskrcnn_benchmark.config import cfg
 from maskrcnn_benchmark.data import make_data_loader
 from maskrcnn_benchmark.solver import make_lr_scheduler
 from maskrcnn_benchmark.solver import make_optimizer
-from maskrcnn_benchmark.engine.inference import inference
+from maskrcnn_benchmark.engine.text_inference import inference
 from maskrcnn_benchmark.engine.trainer import do_train
 from maskrcnn_benchmark.modeling.detector import build_detection_model
 from maskrcnn_benchmark.utils.checkpoint import DetectronCheckpointer
@@ -94,6 +94,7 @@ def test(cfg, model, distributed):
             mkdir(output_folder)
             output_folders[idx] = output_folder
     data_loaders_val = make_data_loader(cfg, is_train=False, is_distributed=distributed)
+    model_name = cfg.MODEL.WEIGHT.split('/')[-1]
     for output_folder, data_loader_val in zip(output_folders, data_loaders_val):
         inference(
             model,
@@ -104,6 +105,8 @@ def test(cfg, model, distributed):
             expected_results=cfg.TEST.EXPECTED_RESULTS,
             expected_results_sigma_tol=cfg.TEST.EXPECTED_RESULTS_SIGMA_TOL,
             output_folder=output_folder,
+            model_name=model_name,
+            cfg=cfg,
         )
         synchronize()
 
